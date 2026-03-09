@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorting Stories</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Interactive walkthroughs</p>
+      <h1>Sorting Stories</h1>
+      <p class="lede">Watch Heap, Quick, Merge, and Shell Sort act in real time — trees, pivots, merges, and gap sequences all animated side by side.</p>
+    </div>
+    <div class="actions">
+      <button id="generate" class="btn ghost">Shuffle data</button>
+      <button id="play" class="btn primary">Play</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel controls">
+      <div class="control">
+        <label for="algorithm">Algorithm</label>
+        <select id="algorithm">
+          <option value="heap">Heap Sort</option>
+          <option value="quick">Quick Sort</option>
+          <option value="merge">Merge Sort</option>
+          <option value="shell">Shell Sort</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="size">Array size <span id="size-value">16</span></label>
+        <input type="range" id="size" min="8" max="40" value="16" />
+      </div>
+      <div class="control">
+        <label for="custom-array">Custom array (comma or space separated)</label>
+        <div class="custom-row">
+          <input id="custom-array" type="text" placeholder="e.g. 5, 1, 4, 2, 8" />
+          <button id="load-array" class="btn">Load</button>
+        </div>
+        <p class="hint">If provided, playback uses this array exactly.</p>
+      </div>
+      <div class="control">
+        <label for="speed">Speed (ms / step) <span id="speed-value">140</span></label>
+        <input type="range" id="speed" min="30" max="600" value="140" />
+      </div>
+      <div class="control inline">
+        <button id="step" class="btn">Step</button>
+        <button id="reset" class="btn ghost">Reset</button>
+      </div>
+      <p class="hint">Tip: keep sizes under 30 to see tree layouts and partitions clearly.</p>
+    </section>
+
+    <section class="panel visuals">
+      <div class="visual">
+        <div class="visual-header">
+          <h2>Array View</h2>
+          <span id="status" class="status">ready</span>
+        </div>
+        <div id="bars" class="bars"></div>
+        <div id="array-values" class="array-values"></div>
+      </div>
+      <div class="visual">
+        <div class="visual-header">
+          <h2 id="secondary-title">Algorithm View</h2>
+          <span id="detail" class="detail">No step yet</span>
+        </div>
+        <svg id="overlay" class="overlay" viewBox="0 0 1100 500" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+    </section>
+
+    <section class="panel legend">
+      <h3>Legend</h3>
+      <ul>
+        <li><span class="dot swap"></span>swap / overwrite</li>
+        <li><span class="dot pivot"></span>pivot / root focus</li>
+        <li><span class="dot compare"></span>comparison</li>
+        <li><span class="dot run"></span>Shell Sort gap grouping</li>
+      </ul>
+      <p class="note">Each step snapshots the full array. The secondary view changes per algorithm: tree for Heap, pivot bands for Quick, merging lanes for Merge, and gap visualization for Shell.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
