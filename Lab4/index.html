@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 4 - Shortest Path Algorithms</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            font-size: 1.05em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            padding: 40px;
+            align-items: start;
+        }
+
+        .controls {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #e0e5eb;
+        }
+
+        .controls h2 {
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .control-group {
+            margin-bottom: 22px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e5eb;
+            border-radius: 10px;
+            font-size: 0.95em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            color: #2d3748;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #f5576c;
+            box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+            background: #fafbfc;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        button {
+            padding: 13px 20px;
+            font-size: 0.95em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            grid-column: 1 / -1;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #f5576c;
+            border: 2px solid #f5576c;
+        }
+
+        .btn-secondary:hover {
+            background: #fef5f7;
+            transform: translateY(-1px);
+        }
+
+        .visualization {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+            border: 1px solid #e0e5eb;
+        }
+
+        canvas {
+            max-width: 100%;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #e0e5eb;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.2);
+            color: white;
+        }
+
+        .metric-card h3 {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .metric-card p {
+            color: white;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .algorithm-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .algorithm-tabs button {
+            padding: 12px;
+            border: 2px solid #e0e5eb;
+            border-radius: 10px;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .algorithm-tabs button.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 16px;
+            border-radius: 10px;
+            border-left: 4px solid #f5576c;
+            margin-bottom: 20px;
+            color: #c2185b;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .log-area {
+            background: white;
+            border: 2px solid #e0e5eb;
+            border-radius: 10px;
+            padding: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            margin-top: 15px;
+            color: #2d3748;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛤️ Shortest Path Algorithms</h1>
+            <p>Dijkstra & Floyd-Warshall Visualization</p>
+        </header>
+
+        <div class="content">
+            <div class="controls">
+                <div class="info-box">
+                    <strong>Select Algorithm:</strong> Compare Dijkstra's and Floyd-Warshall algorithms for finding shortest paths.
+                </div>
+
+                <div class="algorithm-tabs">
+                    <button class="active" onclick="setAlgorithm('dijkstra')">Dijkstra</button>
+                    <button onclick="setAlgorithm('floyd')">Floyd-Warshall</button>
+                </div>
+
+                <div class="control-group">
+                    <label>Number of Nodes:</label>
+                    <input type="number" id="numNodes" value="8" min="3" max="20">
+                </div>
+
+                <div class="control-group">
+                    <label>Graph Density (%):</label>
+                    <input type="number" id="density" value="40" min="10" max="100">
+                </div>
+
+                <div class="control-group">
+                    <label>Source Node:</label>
+                    <input type="number" id="sourceNode" value="0" min="0" max="19">
+                </div>
+
+                <div class="control-group">
+                    <label>Target Node:</label>
+                    <input type="number" id="targetNode" value="7" min="0" max="19">
+                </div>
+
+                <div class="control-group">
+                    <label>Animation Speed (ms):</label>
+                    <input type="number" id="animationSpeed" value="300" min="100" max="2000" step="100">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateGraph()">Generate Graph</button>
+                    <button class="btn-secondary" onclick="resetVisualization()">Reset</button>
+                    <button class="btn-primary" onclick="startAlgorithm()" style="grid-column: 1 / -1;">Run Algorithm</button>
+                </div>
+
+                <div class="metrics">
+                    <div class="metric-card">
+                        <h3>Shortest Distance</h3>
+                        <p id="metricDistance">∞</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Time (ms)</h3>
+                        <p id="metricTime">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Path Length</h3>
+                        <p id="metricPath">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Status</h3>
+                        <p id="metricStatus">Ready</p>
+                    </div>
+                </div>
+
+                <div class="log-area" id="logArea"></div>
+            </div>
+
+            <div class="visualization">
+                <canvas id="graphCanvas" width="500" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="shortest-path.js"></script>
+</body>
+</html>
