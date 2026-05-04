@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 3 - Graph Search Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.6em;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            gap: 0;
+            padding: 0;
+        }
+
+        .visualization {
+            background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 700px;
+            border-right: 1px solid #e0e5eb;
+        }
+
+        canvas {
+            max-width: 100%;
+            border-radius: 12px;
+            background: white;
+            border: 2px solid #e0e5eb;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .controls {
+            background: #ffffff;
+            padding: 35px 30px;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+
+        .controls h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e5eb;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            color: #2d3748;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .algorithm-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .algorithm-tabs button {
+            padding: 10px;
+            border: 2px solid #e0e5eb;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .algorithm-tabs button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        button {
+            padding: 11px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #4a5568;
+            border: 2px solid #e0e5eb;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .metric-card h3 {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.75em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .metric-card p {
+            color: white;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 14px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 18px;
+            color: #4a5568;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .visualization {
+                border-right: none;
+                border-bottom: 1px solid #e0e5eb;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Graph Search Visualization</h1>
+            <p>Depth-First Search (DFS) & Breadth-First Search (BFS)</p>
+        </header>
+
+        <div class="content">
+            <div class="controls">
+                <div class="info-box">
+                    <strong>Select Algorithm:</strong> Choose between DFS and BFS to visualize different graph traversal strategies.
+                </div>
+
+                <div class="algorithm-tabs">
+                    <button class="active" onclick="setAlgorithm('dfs')">DFS</button>
+                    <button onclick="setAlgorithm('bfs')">BFS</button>
+                </div>
+
+                <div class="control-group">
+                    <label>Number of Nodes:</label>
+                    <input type="number" id="numNodes" value="8" min="3" max="20">
+                </div>
+
+                <div class="control-group">
+                    <label>Edge Probability (%):</label>
+                    <input type="number" id="edgeProbability" value="40" min="10" max="100">
+                </div>
+
+                <div class="control-group">
+                    <label>Start Node:</label>
+                    <input type="number" id="startNode" value="0" min="0" max="19">
+                </div>
+
+                <div class="control-group">
+                    <label>Target Node:</label>
+                    <input type="number" id="targetNode" value="7" min="0" max="19">
+                </div>
+
+                <div class="control-group">
+                    <label>Animation Speed (ms):</label>
+                    <input type="number" id="animationSpeed" value="500" min="100" max="2000" step="100">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateGraph()">Generate Graph</button>
+                    <button class="btn-secondary" onclick="resetVisualization()">Reset</button>
+                    <button class="btn-primary" onclick="startSearch()" style="grid-column: 1 / -1;">Start Search</button>
+                </div>
+
+                <div class="metrics">
+                    <div class="metric-card">
+                        <h3>Time (ms)</h3>
+                        <p id="metricTime">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Nodes Visited</h3>
+                        <p id="metricVisited">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Path Length</h3>
+                        <p id="metricPath">0</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Status</h3>
+                        <p id="metricStatus">Ready</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization">
+                <canvas id="graphCanvas" width="500" height="600"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="graph-search.js"></script>
+</body>
+</html>
